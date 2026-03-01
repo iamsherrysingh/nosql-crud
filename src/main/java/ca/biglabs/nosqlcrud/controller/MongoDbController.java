@@ -28,7 +28,7 @@ public class MongoDbController {
         return userRepository.findAll();
     }
 
-    @PostMapping("/users")
+    @PostMapping("/user")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User savedUser = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
