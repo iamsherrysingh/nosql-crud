@@ -1,7 +1,10 @@
 package ca.biglabs.nosqlcrud.dto;
 
+import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
 @Document(collection = "users")
 public class User {
     @Id
@@ -11,5 +14,4 @@ public class User {
     private String email;
     private String jobType;
     private Integer age;
-
 }

@@ -1,0 +1,65 @@
+[{
+  "_id": {
+    "$oid": "69a3e87b108192a0444dd4fe"
+  },
+  "email": "sherry@example.com",
+  "age": 31,
+  "createdAt": {
+    "$date": "2026-02-28T00:00:00.000Z"
+  },
+  "firstName": "Sherry",
+  "jobType": "CT",
+  "lastName": "Singh"
+},
+{
+  "_id": {
+    "$oid": "69a3e885108192a0444dd500"
+  },
+  "email": "himanshu@example.com",
+  "age": 33,
+  "createdAt": {
+    "$date": "2026-02-28T00:03:00.000Z"
+  },
+  "firstName": "Himanshu",
+  "jobType": "CT",
+  "lastName": "Mahajan"
+},
+{
+  "_id": {
+    "$oid": "69a3eacd108192a0444dd504"
+  },
+  "firstName": "Vrind",
+  "lastName": "Gupta",
+  "email": "vrind@example.com",
+  "age": 28,
+  "jobType": "FT",
+  "createdAt": {
+    "$date": "2026-02-28T23:39:10.000Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "69a3eff2b65c522395b693fa"
+  },
+  "age": 30,
+  "createdAt": {
+    "$date": "2026-02-28T23:39:10.000Z"
+  },
+  "email": "manjit@example.com",
+  "firstName": "Manjit",
+  "jobType": "FT",
+  "lastName": "Rana"
+},
+{
+  "_id": {
+    "$oid": "69a3f02ab65c522395b693fb"
+  },
+  "age": 32,
+  "createdAt": {
+    "$date": "2026-02-28T23:51:45.000Z"
+  },
+  "email": "amar@example.com",
+  "firstName": "Amar",
+  "jobType": "FT",
+  "lastName": "Singh"
+}]
