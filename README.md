@@ -50,6 +50,21 @@ spring.mongodb.uri=mongodb://admin:adminpass@10.10.10.224:27017/admin
 spring.jackson.time-zone=America/Toronto
 ```
 
+## MongoDB setup (Docker)
+
+MongoDB can be run locally with Docker using the compose file in the database dump folder:
+
+**[database dump](src/main/resources/database%20dump/)**
+
+1. From the project root, start MongoDB:
+   ```bash
+   docker-compose -f "src/main/resources/database dump/docker-compose.yml" up -d
+   ```
+2. The `admin` database is created automatically. The **`users` collection must be created manually** in the `admin` database (e.g. via MongoDB Compass or mongosh).
+3. Optional: import seed data from `admin.users.json` in the same folder if you use a tool that supports JSON import.
+
+For local Docker, use `localhost` in the connection URI (e.g. `mongodb://admin:adminpass@localhost:27017/admin`) in `application.properties` if needed.
+
 ## Run
 
 ```bash
