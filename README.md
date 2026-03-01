@@ -1,94 +1,78 @@
 # NoSQL CRUD
 
-A Spring Boot REST API for managing user data stored in MongoDB. This project demonstrates basic CRUD-style operations with Spring Data MongoDB.
+Spring Boot REST API for user data in MongoDB. Supports full CRUD operations.
 
 ## Tech Stack
 
-- **Java 25**
-- **Spring Boot 4.0.3**
-- **Spring Data MongoDB**
-- **Spring Web (MVC)**
-- **Lombok**
-- **MongoDB**
+- Java 25, Spring Boot 4.0.3
+- Spring Data MongoDB, Spring Web, Validation, Lombok
 
 ## Project Structure
 
 ```
 src/main/java/ca/biglabs/nosqlcrud/
-├── NosqlCrudApplication.java    # Application entry point
-├── controller/
-│   └── MongoDbController.java   # REST endpoints for users
-├── dto/
-│   └── User.java                # User entity/document model
-└── repository/
-    └── UserRepository.java      # MongoDB data access layer
+├── NosqlCrudApplication.java
+├── controller/MongoDbController.java
+├── dto/User.java
+└── repository/UserRepository.java
 ```
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/users` | Returns all users from the MongoDB `users` collection |
+| `GET` | `/users` | List all users |
+| `POST` | `/user` | Create user |
+| `PUT` | `/users/{id}` | Update user by id |
+| `DELETE` | `/users/{id}` | Delete user by id |
 
 ## User Model
 
-The `User` entity maps to the `users` collection in MongoDB with the following fields:
+Maps to `users` collection in `admin` database:
 
-| Field | Type |
-|-------|------|
-| `id` | String (MongoDB ObjectId) |
-| `firstName` | String |
-| `lastName` | String |
-| `email` | String |
-| `jobType` | String |
-| `age` | Integer |
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | String | Auto-generated (MongoDB ObjectId) |
+| `createdAt` | Date | Auto-populated on create |
+| `firstName` | String | Required |
+| `lastName` | String | Required |
+| `email` | String | Required, valid format |
+| `jobType` | String | Optional |
+| `age` | Integer | Optional, min 0 |
 
 ## Configuration
 
-MongoDB connection is configured in `src/main/resources/application.properties`:
+`src/main/resources/application.properties`:
 
 ```properties
 spring.application.name=nosql-crud
 spring.mongodb.uri=mongodb://admin:adminpass@10.10.10.224:27017/admin
+spring.jackson.time-zone=America/Toronto
 ```
 
-**Note:** Spring Data MongoDB uses `spring.data.mongodb.uri` by default. If connection issues occur, add:
-
-```properties
-spring.data.mongodb.uri=${spring.mongodb.uri}
-```
-
-### Database
-
-- **Database:** `admin` (from URI path)
-- **Collection:** `users`
-
-## Prerequisites
-
-- Java 25+
-- Maven 3.6+
-- MongoDB instance (local or remote)
-
-## Running the Application
+## Run
 
 ```bash
-# Build the project
 mvn clean install
-
-# Run the application
 mvn spring-boot:run
 ```
 
-The API will be available at `http://localhost:8080` (default Spring Boot port).
+API: `http://localhost:8080`
 
-## Example Request
+## Example Requests
 
 ```bash
-# Get all users
+# List users
 curl http://localhost:8080/users
+
+# Create user
+curl -X POST http://localhost:8080/user -H "Content-Type: application/json" \
+  -d '{"firstName":"Jane","lastName":"Doe","email":"jane@example.com","jobType":"Engineer","age":30}'
+
+# Update user
+curl -X PUT http://localhost:8080/users/{id} -H "Content-Type: application/json" \
+  -d '{"firstName":"Jane","lastName":"Smith","email":"jane@example.com","jobType":"Manager","age":35}'
+
+# Delete user
+curl -X DELETE http://localhost:8080/users/{id}
 ```
-
-## Development
-
-- **DevTools** is included for automatic restart during development
-- Tests use `spring-boot-starter-mongodb-test` and `spring-boot-starter-webmvc-test`
