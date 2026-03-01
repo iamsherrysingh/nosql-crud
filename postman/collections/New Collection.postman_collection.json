@@ -1,0 +1,133 @@
+{
+  "info": {
+    "_postman_id": "0f106305-1f12-4292-a5dd-3b5194b4be4e",
+    "name": "nosql-crud",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Delete User",
+      "id": "f1e31eb5-6772-4fbd-b688-6ad28269118f",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/69a403418228c82da8382d06",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users",
+            "69a403418228c82da8382d06"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User",
+      "id": "4ae4666d-4f5d-4b0c-b355-62cb7fa70694",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "uuid": "52baff0c-e00f-4331-8a55-3d9a6e480531"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"firstName\": \"Jane\", \"lastName\": \"Smith\", \"email\": \"jane@example.com\", \"jobType\": \"Manager\", \"age\": 42}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/users/69a407ab5ac3deaed4ae1e75",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users",
+            "69a407ab5ac3deaed4ae1e75"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add User",
+      "id": "6adac1ea-9179-4ee5-9a24-fa87e8135c53",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "uuid": "fb2154c8-da08-45a0-b8ab-522ecc5f50ef"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"firstName\": \"John\", \"lastName\": \"Doe\", \"email\": \"john@example.com\", \"jobType\": \"CT\", \"age\": 30}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all users",
+      "id": "f72a5c1d-4783-404d-a85f-d1da9e4a52ad",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

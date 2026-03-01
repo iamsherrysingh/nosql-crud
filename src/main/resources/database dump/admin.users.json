@@ -62,4 +62,32 @@
   "firstName": "Amar",
   "jobType": "FT",
   "lastName": "Singh"
+},
+{
+  "_id": {
+    "$oid": "69a404fd65bd9c2bf848bcd6"
+  },
+  "createdAt": {
+    "$date": "2026-03-01T09:21:01.642Z"
+  },
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@example.com",
+  "jobType": "CT",
+  "age": 30,
+  "_class": "ca.biglabs.nosqlcrud.dto.User"
+},
+{
+  "_id": {
+    "$oid": "69a407ab5ac3deaed4ae1e75"
+  },
+  "createdAt": {
+    "$date": "2026-03-01T09:32:27.325Z"
+  },
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "email": "jane@example.com",
+  "jobType": "Manager",
+  "age": 42,
+  "_class": "ca.biglabs.nosqlcrud.dto.User"
 }]
