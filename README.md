@@ -17,6 +17,90 @@ src/main/java/ca/biglabs/nosqlcrud/
 └── repository/UserRepository.java
 ```
 
+## System Design
+
+### High-Level Architecture
+
+This project is a layered Spring Boot REST API that exposes CRUD operations for user data stored in MongoDB.
+
+- **Client**: Any HTTP client (browser, Postman, curl) calls REST endpoints on the Spring Boot service.
+- **API Layer (Controller)**: `MongoDbController` handles HTTP requests, validates input, and maps endpoints to repository operations.
+- **Persistence Layer (Repository)**: `UserRepository` is a `MongoRepository<User, String>` that abstracts MongoDB access via Spring Data.
+- **Database**: MongoDB stores user documents in the `users` collection of the `admin` database.
+
+The application uses **Spring Boot auto-configuration** and **Spring Data MongoDB** to minimize boilerplate. Auditing is enabled via `@EnableMongoAuditing` in `NosqlCrudApplication`.
+
+### Components
+
+- **Entry Point**
+  - `NosqlCrudApplication` bootstraps Spring Boot and enables Mongo auditing.
+- **Controller**
+  - `MongoDbController` exposes REST endpoints:
+    - `GET /users` – fetch all users
+    - `POST /user` – create a new user
+    - `PUT /users/{id}` – update an existing user by id
+    - `DELETE /users/{id}` – delete a user by id
+  - Uses `UserRepository` to interact with MongoDB.
+- **Data Transfer Object / Document**
+  - `User` represents a user document stored in MongoDB and is used as the request/response body.
+  - Validation annotations ensure required fields and basic constraints (e.g., email format, non-negative age).
+- **Repository**
+  - `UserRepository` extends `MongoRepository<User, String>` and inherits standard CRUD methods (`findAll`, `save`, `findById`, `deleteById`, etc.).
+
+### Data Flow
+
+1. **Create**
+   - Client sends `POST /user` with a JSON payload.
+   - `MongoDbController.createUser` validates the request body and calls `userRepository.save(user)`.
+   - MongoDB generates an ObjectId (`id`) and persists the document in the `users` collection.
+2. **Read**
+   - Client sends `GET /users`.
+   - Controller calls `userRepository.findAll()`, returning a list of `User` documents.
+3. **Update**
+   - Client sends `PUT /users/{id}` with updated JSON.
+   - Controller looks up the existing user via `userRepository.findById(id)`, preserves `createdAt`, and saves the updated document.
+4. **Delete**
+   - Client sends `DELETE /users/{id}`.
+   - Controller verifies existence with `existsById(id)` and then calls `deleteById(id)`.
+
+### System Design Diagrams
+
+#### Component Diagram
+
+```mermaid
+flowchart LR
+    Client[HTTP Client\n(Postman, curl, Frontend)] -->|REST calls| API[Spring Boot App\nnosql-crud]
+
+    subgraph SpringBoot[Spring Boot Application]
+        direction TB
+        Ctrl[MongoDbController\n(REST Controller)]
+        Repo[UserRepository\n(Spring Data MongoDB)]
+        User[User\n(Document / DTO)]
+    end
+
+    API --> Ctrl
+    Ctrl --> Repo
+    Repo -->|CRUD operations| MongoDB[(MongoDB\nadmin.users)]
+    Repo --> User
+```
+
+#### CRUD Request Flow (Sequence)
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant Ctrl as MongoDbController
+    participant Repo as UserRepository
+    participant DB as MongoDB (users collection)
+
+    C->>Ctrl: POST /user (User JSON)
+    Ctrl->>Repo: save(user)
+    Repo->>DB: insert document
+    DB-->>Repo: inserted document (with id, createdAt)
+    Repo-->>Ctrl: saved User
+    Ctrl-->>C: 201 Created (User JSON)
+```
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
