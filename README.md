@@ -31,15 +31,16 @@ This project is a layered Spring Boot REST API that exposes CRUD operations for 
 The application uses **Spring Boot auto-configuration** and **Spring Data MongoDB** to minimize boilerplate. Auditing is enabled via `@EnableMongoAuditing` in `NosqlCrudApplication`.
 
 ### Components
-
+ 
 - **Entry Point**
   - `NosqlCrudApplication` bootstraps Spring Boot and enables Mongo auditing.
 - **Controller**
   - `MongoDbController` exposes REST endpoints:
     - `GET /users` – fetch all users
     - `POST /user` – create a new user
-    - `PUT /users/{id}` – update an existing user by id
-    - `DELETE /users/{id}` – delete a user by id
+    - `GET /user/{id}` – fetch a user by id
+    - `PUT /user/{id}` – update an existing user by id
+    - `DELETE /user/{id}` – delete a user by id
   - Uses `UserRepository` to interact with MongoDB.
 - **Data Transfer Object / Document**
   - `User` represents a user document stored in MongoDB and is used as the request/response body.
@@ -106,9 +107,10 @@ sequenceDiagram
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/users` | List all users |
+| `GET` | `/user/{id}` | Get user by id |
 | `POST` | `/user` | Create user |
-| `PUT` | `/users/{id}` | Update user by id |
-| `DELETE` | `/users/{id}` | Delete user by id |
+| `PUT` | `/user/{id}` | Update user by id |
+| `DELETE` | `/user/{id}` | Delete user by id |
 
 ## User Model
 
@@ -169,9 +171,9 @@ curl -X POST http://localhost:8080/user -H "Content-Type: application/json" \
   -d '{"firstName":"Jane","lastName":"Doe","email":"jane@example.com","jobType":"Engineer","age":30}'
 
 # Update user
-curl -X PUT http://localhost:8080/users/{id} -H "Content-Type: application/json" \
+curl -X PUT http://localhost:8080/user/{id} -H "Content-Type: application/json" \
   -d '{"firstName":"Jane","lastName":"Smith","email":"jane@example.com","jobType":"Manager","age":35}'
 
 # Delete user
-curl -X DELETE http://localhost:8080/users/{id}
+curl -X DELETE http://localhost:8080/user/{id}
 ```
