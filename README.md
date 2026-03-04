@@ -6,6 +6,7 @@ Spring Boot REST API for user data in MongoDB. Supports full CRUD operations.
 
 - Java 25, Spring Boot 4.0.3
 - Spring Data MongoDB, Spring Web, Validation, Lombok
+- Spring Cache with Redis (JSON serialization)
 
 ## Project Structure
 
@@ -21,27 +22,30 @@ src/main/java/ca/biglabs/nosqlcrud/
 
 ### High-Level Architecture
 
-This project is a layered Spring Boot REST API that exposes CRUD operations for user data stored in MongoDB.
+This project is a layered Spring Boot REST API that exposes CRUD operations for user data stored in MongoDB, with a Redis cache in front of single-user lookups.
 
 - **Client**: Any HTTP client (browser, Postman, curl) calls REST endpoints on the Spring Boot service.
-- **API Layer (Controller)**: `MongoDbController` handles HTTP requests, validates input, and maps endpoints to repository operations.
+- **API Layer (Controller)**: `MongoDbController` handles HTTP requests, validation, and delegates to the service layer.
+- **Service Layer**: `UserService` implements business logic and applies caching semantics.
 - **Persistence Layer (Repository)**: `UserRepository` is a `MongoRepository<User, String>` that abstracts MongoDB access via Spring Data.
+- **Cache**: Redis stores JSON-serialized `User` objects for `/user/{id}` lookups.
 - **Database**: MongoDB stores user documents in the `users` collection of the `admin` database.
 
-The application uses **Spring Boot auto-configuration** and **Spring Data MongoDB** to minimize boilerplate. Auditing is enabled via `@EnableMongoAuditing` in `NosqlCrudApplication`.
+The application uses **Spring Boot auto-configuration**, **Spring Data MongoDB**, and **Spring Cache with Redis**. Auditing is enabled via `@EnableMongoAuditing` in `NosqlCrudApplication`, and caching via `@EnableCaching`.
 
 ### Components
  
 - **Entry Point**
-  - `NosqlCrudApplication` bootstraps Spring Boot and enables Mongo auditing.
+  - `NosqlCrudApplication` bootstraps Spring Boot and enables Mongo auditing and caching.
 - **Controller**
   - `MongoDbController` exposes REST endpoints:
     - `GET /users` – fetch all users
     - `POST /user` – create a new user
-    - `GET /user/{id}` – fetch a user by id
-    - `PUT /user/{id}` – update an existing user by id
-    - `DELETE /user/{id}` – delete a user by id
-  - Uses `UserRepository` to interact with MongoDB.
+    - `GET /user/{id}` – fetch a user by id (cached)
+    - `PUT /user/{id}` – update an existing user by id (keeps cache in sync)
+    - `DELETE /user/{id}` – delete a user by id (evicts from cache)
+- **Service**
+  - `UserService` coordinates with `UserRepository` and applies caching annotations (`@Cacheable`, `@CachePut`, `@CacheEvict`) on user operations.
 - **Data Transfer Object / Document**
   - `User` represents a user document stored in MongoDB and is used as the request/response body.
   - Validation annotations ensure required fields and basic constraints (e.g., email format, non-negative age).
@@ -54,15 +58,19 @@ The application uses **Spring Boot auto-configuration** and **Spring Data MongoD
    - Client sends `POST /user` with a JSON payload.
    - `MongoDbController.createUser` validates the request body and calls `userRepository.save(user)`.
    - MongoDB generates an ObjectId (`id`) and persists the document in the `users` collection.
-2. **Read**
+2. **Read (list)**
    - Client sends `GET /users`.
-   - Controller calls `userRepository.findAll()`, returning a list of `User` documents.
-3. **Update**
-   - Client sends `PUT /users/{id}` with updated JSON.
-   - Controller looks up the existing user via `userRepository.findById(id)`, preserves `createdAt`, and saves the updated document.
-4. **Delete**
-   - Client sends `DELETE /users/{id}`.
-   - Controller verifies existence with `existsById(id)` and then calls `deleteById(id)`.
+   - Controller calls `userService.getAllUsers()`, which delegates to `userRepository.findAll()`, returning a list of `User` documents.
+3. **Read (single, cached)**
+   - Client sends `GET /user/{id}`.
+   - Controller calls `userService.getUserById(id)`.
+   - On a cache miss, `UserService` loads from MongoDB via `userRepository.findById(id)` and stores the JSON-serialized `User` in Redis; on subsequent calls the value is served from Redis.
+4. **Update**
+   - Client sends `PUT /user/{id}` with updated JSON.
+   - Controller looks up the existing user via `userService.getUserById(id)`, preserves `createdAt`, then calls `userService.updateUser(id, user)` which saves to MongoDB and updates the cached entry.
+5. **Delete**
+   - Client sends `DELETE /user/{id}`.
+   - Controller verifies existence via `userService.getUserById(id)` and then calls `userService.deleteUser(id)`, which deletes from MongoDB and evicts the cached entry.
 
 ### System Design Diagrams
 
@@ -131,9 +139,16 @@ Maps to `users` collection in `admin` database:
 `src/main/resources/application.properties`:
 
 ```properties
+app.docker.host=10.10.10.224
+
 spring.application.name=nosql-crud
-spring.mongodb.uri=mongodb://admin:adminpass@10.10.10.224:27017/admin
+spring.mongodb.uri=mongodb://admin:adminpass@${app.docker.host}:27017/admin
 spring.jackson.time-zone=America/Toronto
+
+# Redis cache configuration
+spring.data.redis.host=${app.docker.host}
+spring.data.redis.port=6379
+spring.data.redis.password=redispass
 ```
 
 ## MongoDB setup (Docker)
